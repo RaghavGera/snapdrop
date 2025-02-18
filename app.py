@@ -8,7 +8,7 @@ import atexit
 app = Flask(__name__)
 
 # Configuration
-app.config['SECRET_KEY'] = 'admin123'  # Set this to a secure random value
+app.config['SECRET_KEY'] = 'admin123'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///snapdrop.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -77,7 +77,6 @@ def signup():
 
 @app.route('/dashboard')
 def dashboard():
-    # Add logic to check if the user is logged in
     return "Welcome to your dashboard!"
 
 @app.route('/upload', methods=['GET', 'POST'])
