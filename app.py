@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'admin123'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///snapdrop.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
 
 # Initialize extensions
 db = SQLAlchemy(app)
@@ -83,10 +83,12 @@ def dashboard():
 def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
-            return 'No file part'
+            flash('No file part', 'error')
+            return redirect(request.url)
         file = request.files['file']
         if file.filename == '':
-            return 'No selected file'
+            flash('No selected file', 'error')
+            return redirect(request.url)
         if file:
             filename = file.filename
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -94,8 +96,14 @@ def upload_file():
             new_file = File(filename=filename, filepath=filepath)
             db.session.add(new_file)
             db.session.commit()
-            return 'File uploaded successfully'
+            flash('File uploaded successfully', 'success')
+            return redirect(url_for('index'))
     return render_template('upload.html')
+
+@app.route('/uploads')
+def uploads():
+    files = File.query.all()
+    return render_template('upload.html', files=files)
 
 @app.route('/download/<int:file_id>')
 def download_file(file_id):
@@ -103,6 +111,20 @@ def download_file(file_id):
     if file:
         return send_file(file.filepath, as_attachment=True)
     return 'File not found'
+
+@app.route('/cleanup')
+def cleanup_route():
+    cleanup_files()
+    flash('Cleaned up missing files from the database', 'success')
+    return redirect(url_for('index'))
+
+def cleanup_files():
+    files = File.query.all()
+    for file in files:
+        if not os.path.exists(file.filepath):
+            db.session.delete(file)
+    db.session.commit()
+    print('Cleaned up missing files from the database')
 
 def valid_credentials(email, password):
     user = User.query.filter_by(email=email).first()
@@ -134,7 +156,7 @@ def handle_message(msg):
     send(msg, broadcast=True)
 
 def cleanup():
-    db_path = '/uploads/snapdrop.db'
+    db_path = 'snapdrop.db'
     if os.path.exists(db_path):
         os.remove(db_path)
         print(f'Deleted database file: {db_path}')

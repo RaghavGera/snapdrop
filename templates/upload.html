@@ -13,6 +13,7 @@
         font-family: Arial, sans-serif;
         transition: background-color 0.3s, color 0.3s;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         height: 100vh;
@@ -177,7 +178,12 @@
         </svg>
       </a>
     </header>
-    <form action="/upload" method="post" enctype="multipart/form-data">
+    <h1>Upload File</h1>
+    <form
+      action="{{ url_for('upload_file') }}"
+      method="post"
+      enctype="multipart/form-data"
+    >
       <div class="container">
         <div class="header">
           <svg
@@ -256,6 +262,16 @@
         <button type="submit" class="footer">Upload</button>
       </div>
     </form>
+    <h2>Uploaded Files</h2>
+    <ul>
+      {% for file in files %}
+      <li>
+        <a href="{{ url_for('download_file', file_id=file.id) }}"
+          >{{ file.filename }}</a
+        >
+      </li>
+      {% endfor %}
+    </ul>
     <script>
       document
         .getElementById("theme-toggle-checkbox")
