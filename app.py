@@ -155,14 +155,6 @@ def handle_message(msg):
     print('Message: ' + msg)
     send(msg, broadcast=True)
 
-def cleanup():
-    db_path = 'snapdrop.db'
-    if os.path.exists(db_path):
-        os.remove(db_path)
-        print(f'Deleted database file: {db_path}')
-
-atexit.register(cleanup)
-
 # Run the application
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
