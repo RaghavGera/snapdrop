@@ -129,6 +129,3 @@ Consider adding CSRF protection with Flask-WTF if you expand auth.
 
  CI pipeline with tests
 
-🤝 Contributing
-
-Pull requests and issues are welcome. Please follow Python PEP8 style and document your changes.
